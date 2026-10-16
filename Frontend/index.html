@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CampusPulse & SpaceSync — Smart Campus Space Management</title>
+  <meta name="description" content="Find, book, and manage campus spaces intelligently. Real-time availability, smart matching, and utilization analytics for students and administrators." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <!-- Plotly for charts -->
+  <script src="https://cdn.plot.ly/plotly-2.32.0.min.js"></script>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+  <!-- ═══════════════════════════════════════════ SIDEBAR ══════════════════════════════════════════ -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-brand">
+      <div class="brand-icon">
+        <svg width="26" height="26" viewBox="0 0 26 26" fill="none">
+          <path d="M3 3h9v9H3V3zm11 0h9v9h-9V3zM3 14h9v9H3v-9zm11 4h3v-3h2v3h3v2h-3v3h-2v-3h-3v-2z" fill="currentColor"/>
+        </svg>
+      </div>
+      <div class="brand-text">
+        <span class="brand-name">CampusPulse</span>
+        <span class="brand-sub">&amp; SpaceSync</span>
+      </div>
+    </div>
+
+    <nav class="sidebar-nav">
+      <span class="nav-section-label">Navigation</span>
+      <button class="nav-item active" id="nav-finder" onclick="navigateTo('finder')">
+        <span class="nav-icon">&#127891;</span>
+        <span class="nav-label">Room Finder</span>
+        <span class="nav-badge">Student</span>
+      </button>
+      <button class="nav-item" id="nav-admin" onclick="navigateTo('admin')">
+        <span class="nav-icon">&#128202;</span>
+        <span class="nav-label">Admin Analytics</span>
+        <span class="nav-badge admin">Admin</span>
+      </button>
+    </nav>
+
+    <div class="sidebar-footer">
+      <div class="sidebar-status">
+        <span class="status-dot"></span>
+        <span class="status-text">Live Campus Data</span>
+      </div>
+      <div class="sidebar-time" id="sidebar-clock">--:--</div>
+    </div>
+  </aside>
+
+  <!-- ════════════════════════════════════════ MAIN CONTENT ════════════════════════════════════════ -->
+  <main class="main-content">
+
+    <!-- TOP BAR -->
+    <header class="topbar">
+      <button class="sidebar-toggle" id="sidebar-toggle" onclick="toggleSidebar()" aria-label="Toggle sidebar">
+        <span></span><span></span><span></span>
+      </button>
+      <div class="topbar-title" id="topbar-title">&#127891; Student &amp; Club Room Finder</div>
+      <div class="topbar-actions">
+        <div class="topbar-date" id="topbar-date"></div>
+        <div class="topbar-avatar">RS</div>
+      </div>
+    </header>
+
+    <!-- ══════════════════════════════ PAGE: ROOM FINDER ══════════════════════════════ -->
+    <section class="page active" id="page-finder">
+
+      <!-- Hero -->
+      <div class="page-hero finder-hero">
+        <div class="hero-content">
+          <h1>Find Your Perfect Space</h1>
+          <p>Search available rooms that match your needs — instant clash detection, smart ranking, and one-click booking.</p>
+        </div>
+        <div class="hero-stats">
+          <div class="hero-stat"><span class="hero-stat-num" id="stat-total-rooms">19</span><span class="hero-stat-label">Active Rooms</span></div>
+          <div class="hero-stat"><span class="hero-stat-num" id="stat-available-now">12</span><span class="hero-stat-label">Available Now</span></div>
+          <div class="hero-stat"><span class="hero-stat-num" id="stat-pending-req">8</span><span class="hero-stat-label">Pending Requests</span></div>
+        </div>
+      </div>
+
+      <!-- Search Panel -->
+      <div class="search-panel glass-card">
+        <div class="search-panel-header">
+          <h2>&#128269; Search Filters</h2>
+          <button class="btn-ghost" onclick="resetFilters()">Reset All</button>
+        </div>
+        <div class="filter-grid">
+
+          <div class="filter-group">
+            <label class="filter-label" for="filter-date">&#128197; Date</label>
+            <input type="date" id="filter-date" class="filter-input" />
+          </div>
+
+          <div class="filter-group">
+            <label class="filter-label" for="filter-start">&#9200; Start Time</label>
+            <input type="time" id="filter-start" class="filter-input" value="09:00" />
+          </div>
+
+          <div class="filter-group">
+            <label class="filter-label" for="filter-end">&#9201; End Time</label>
+            <input type="time" id="filter-end" class="filter-input" value="11:00" />
+          </div>
+
+          <div class="filter-group">
+            <label class="filter-label" for="filter-capacity">&#128101; Min Capacity: <span id="cap-display">20</span></label>
+            <input type="range" id="filter-capacity" class="filter-slider" min="5" max="500" value="20" oninput="document.getElementById('cap-display').textContent=this.value" />
+          </div>
+
+          <div class="filter-group span-2">
+            <label class="filter-label">&#128295; Required Facilities</label>
+            <div class="facility-chips" id="facility-chips">
+              <button class="chip" data-facility="Projector" onclick="toggleFacility(this)">&#128253; Projector</button>
+              <button class="chip" data-facility="Whiteboard" onclick="toggleFacility(this)">&#128221; Whiteboard</button>
+              <button class="chip" data-facility="AC" onclick="toggleFacility(this)">&#10052; AC</button>
+              <button class="chip" data-facility="Smart Screen" onclick="toggleFacility(this)">&#128250; Smart Screen</button>
+              <button class="chip" data-facility="Lab Equipment" onclick="toggleFacility(this)">&#128300; Lab Equipment</button>
+            </div>
+          </div>
+
+          <div class="filter-group">
+            <label class="filter-label">&#9855; Accessibility</label>
+            <label class="toggle-label">
+              <input type="checkbox" id="filter-accessible" class="toggle-input" />
+              <span class="toggle-track"><span class="toggle-thumb"></span></span>
+              <span class="toggle-text">Wheelchair / Ramp Access Required</span>
+            </label>
+          </div>
+
+          <div class="filter-group">
+            <label class="filter-label" for="filter-type">&#127963; Room Type</label>
+            <select id="filter-type" class="filter-input">
+              <option value="">All Types</option>
+              <option value="lecture_hall">Lecture Hall</option>
+              <option value="seminar_room">Seminar Room</option>
+              <option value="lab">Lab</option>
+              <option value="board_room">Board Room</option>
+              <option value="discussion_room">Discussion Room</option>
+              <option value="mini_theater">Mini Theater</option>
+              <option value="auditorium">Auditorium</option>
+              <option value="study_hall">Study Hall</option>
+            </select>
+          </div>
+
+        </div>
+        <div class="search-actions">
+          <button class="btn-primary" id="search-btn" onclick="searchRooms()">
+            <span class="btn-icon">&#128269;</span> Find Available Rooms
+          </button>
+        </div>
+      </div>
+
+      <!-- Results -->
+      <div class="results-section" id="results-section" style="display:none;">
+        <div class="results-header">
+          <h2>Available Rooms <span class="results-count-badge" id="results-count">0</span></h2>
+          <div class="results-sort">
+            <label for="sort-select">Sort by:</label>
+            <select id="sort-select" class="filter-input mini" onchange="sortResults()">
+              <option value="match">Best Match</option>
+              <option value="capacity-asc">Capacity &#8593;</option>
+              <option value="capacity-desc">Capacity &#8595;</option>
+              <option value="name">Name A&#8211;Z</option>
+            </select>
+          </div>
+        </div>
+        <div class="room-grid" id="room-grid"></div>
+      </div>
+
+      <!-- Empty State -->
+      <div class="empty-state" id="empty-state" style="display:none;">
+        <div class="empty-icon">&#128270;</div>
+        <h3>No Available Rooms Found</h3>
+        <p>Try adjusting your filters — reduce capacity requirement, change the time slot, or remove facility constraints.</p>
+        <button class="btn-ghost" onclick="resetFilters()">Clear All Filters</button>
+      </div>
+
+      <!-- Initial State -->
+      <div class="initial-state" id="initial-state">
+        <div class="initial-icon">&#127963;&#65039;</div>
+        <h3>Set Your Requirements Above</h3>
+        <p>Select a date, time range, and any required facilities, then click <strong>Find Available Rooms</strong>.</p>
+      </div>
+
+    </section>
+
+    <!-- ══════════════════════════════ PAGE: ADMIN DASHBOARD ══════════════════════════════ -->
+    <section class="page" id="page-admin">
+
+      <div class="page-hero admin-hero">
+        <div class="hero-content">
+          <h1>Space Intelligence Dashboard</h1>
+          <p>Real-time utilization analytics, demand forecasting, and smart room reallocation recommendations.</p>
+        </div>
+      </div>
+
+      <!-- KPI Cards -->
+      <div class="kpi-row">
+        <div class="kpi-card">
+          <div class="kpi-icon">&#128200;</div>
+          <div class="kpi-body">
+            <div class="kpi-label">Overall Utilization</div>
+            <div class="kpi-value">67<span class="kpi-unit">%</span></div>
+            <div class="kpi-sub trend-up">&#8593; 4% vs last week</div>
+          </div>
+          <div class="kpi-ring" style="--pct:67%"></div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-icon">&#127979;</div>
+          <div class="kpi-body">
+            <div class="kpi-label">Active Rooms</div>
+            <div class="kpi-value">19<span class="kpi-unit">/20</span></div>
+            <div class="kpi-sub">1 under maintenance</div>
+          </div>
+          <div class="kpi-ring" style="--pct:95%"></div>
+        </div>
+        <div class="kpi-card amber">
+          <div class="kpi-icon">&#8987;</div>
+          <div class="kpi-body">
+            <div class="kpi-label">Pending Requests</div>
+            <div class="kpi-value" id="kpi-pending">11</div>
+            <div class="kpi-sub trend-warn">4 require urgent review</div>
+          </div>
+          <div class="kpi-ring" style="--pct:55%"></div>
+        </div>
+        <div class="kpi-card green">
+          <div class="kpi-icon">&#9989;</div>
+          <div class="kpi-body">
+            <div class="kpi-label">Rooms In Use Now</div>
+            <div class="kpi-value">7</div>
+            <div class="kpi-sub">Out of 19 active</div>
+          </div>
+          <div class="kpi-ring" style="--pct:37%"></div>
+        </div>
+      </div>
+
+      <!-- Charts Row 1 -->
+      <div class="charts-row">
+        <div class="chart-card glass-card span-2">
+          <div class="chart-card-header">
+            <h3>&#128197; Utilization by Day of Week</h3>
+            <span class="chart-badge">Weekly View</span>
+          </div>
+          <div id="chart-weekly" class="chart-container"></div>
+        </div>
+        <div class="chart-card glass-card">
+          <div class="chart-card-header">
+            <h3>&#128336; Peak Hours Heatmap</h3>
+            <span class="chart-badge">Hourly</span>
+          </div>
+          <div id="chart-hourly" class="chart-container"></div>
+        </div>
+      </div>
+
+      <!-- Charts Row 2 -->
+      <div class="charts-row">
+        <div class="chart-card glass-card">
+          <div class="chart-card-header">
+            <h3>&#127963;&#65039; Room Type Utilization</h3>
+            <span class="chart-badge">By Category</span>
+          </div>
+          <div id="chart-roomtype" class="chart-container"></div>
+        </div>
+        <div class="chart-card glass-card span-2">
+          <div class="chart-card-header">
+            <h3>&#128202; Demand Forecast &#8212; Next 7 Days</h3>
+            <span class="chart-badge">Forecast</span>
+          </div>
+          <div id="chart-forecast" class="chart-container"></div>
+        </div>
+      </div>
+
+      <!-- Underused Rooms -->
+      <div class="glass-card admin-section">
+        <div class="admin-section-header">
+          <h3>&#9888;&#65039; Underused Space Tracker</h3>
+          <span class="chip chip-warn">Utilization &lt; 25%</span>
+        </div>
+        <p class="section-desc">Rooms consistently below 25% usage &#8212; consider repurposing or consolidating schedules.</p>
+        <div class="underused-table-wrap">
+          <table class="data-table" id="underused-table">
+            <thead>
+              <tr>
+                <th>Room</th>
+                <th>Building</th>
+                <th>Type</th>
+                <th>Capacity</th>
+                <th>Avg Utilization</th>
+                <th>Suggestion</th>
+              </tr>
+            </thead>
+            <tbody id="underused-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Pending Requests + Recommendations -->
+      <div class="glass-card admin-section">
+        <div class="admin-section-header">
+          <h3>&#128203; Pending Requests &amp; Smart Recommendations</h3>
+          <span class="chip chip-info" id="pending-count-badge">11 Pending</span>
+        </div>
+        <p class="section-desc">Review incoming room requests. The engine automatically flags inefficient allocations and suggests optimal alternatives.</p>
+        <div id="requests-list"></div>
+      </div>
+
+    </section>
+
+  </main>
+
+  <!-- ═══════════════════ BOOKING MODAL ═══════════════════ -->
+  <div class="modal-overlay" id="booking-modal" onclick="closeModal(event)">
+    <div class="modal glass-card" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+      <button class="modal-close" onclick="closeBookingModal()" aria-label="Close">&#10005;</button>
+      <div class="modal-icon">&#127979;</div>
+      <h2 class="modal-title" id="modal-title">Book a Room</h2>
+      <p class="modal-room-name" id="modal-room-name"></p>
+
+      <form id="booking-form" onsubmit="submitBooking(event)">
+        <div class="form-row">
+          <div class="form-group">
+            <label for="book-name">Your Name</label>
+            <input type="text" id="book-name" class="filter-input" placeholder="e.g. Arjun Mehta" required />
+          </div>
+          <div class="form-group">
+            <label for="book-email">Email</label>
+            <input type="email" id="book-email" class="filter-input" placeholder="you@campus.edu" required />
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="book-group">Group / Club Name</label>
+            <input type="text" id="book-group" class="filter-input" placeholder="e.g. Robotics Club" />
+          </div>
+          <div class="form-group">
+            <label for="book-attendees">Expected Attendees</label>
+            <input type="number" id="book-attendees" class="filter-input" min="1" placeholder="e.g. 30" required />
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="book-purpose">Purpose of Booking</label>
+          <textarea id="book-purpose" class="filter-input textarea" placeholder="e.g. Workshop on Machine Learning basics&#8230;" rows="3" required></textarea>
+        </div>
+        <div class="modal-booking-summary" id="modal-booking-summary"></div>
+        <button type="submit" class="btn-primary full-width">
+          <span class="btn-icon">&#9989;</span> Confirm Booking Request
+        </button>
+      </form>
+
+      <div class="booking-success" id="booking-success" style="display:none;">
+        <div class="success-animation">&#127881;</div>
+        <h3>Request Submitted!</h3>
+        <p id="success-message"></p>
+        <button class="btn-ghost" onclick="closeBookingModal()">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div class="toast" id="toast"></div>
+
+  <script src="data.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

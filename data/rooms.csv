@@ -1,0 +1,21 @@
+room_id,room_name,building,floor,capacity,facilities,accessible,room_type,status
+R001,Lecture Hall A,Academic Block,1,150,"Projector,AC,Smart Screen,Whiteboard",yes,lecture_hall,active
+R002,Lecture Hall B,Academic Block,2,120,"Projector,AC,Whiteboard",no,lecture_hall,active
+R003,Seminar Room 1,Innovation Hub,1,40,"Projector,Whiteboard,AC",yes,seminar_room,active
+R004,Seminar Room 2,Innovation Hub,2,35,"Projector,Whiteboard",no,seminar_room,active
+R005,Seminar Room 3,Innovation Hub,3,50,"Projector,AC,Smart Screen",no,seminar_room,active
+R006,Computer Lab 1,Tech Center,1,60,"Lab Equipment,AC,Projector,Smart Screen",yes,lab,active
+R007,Computer Lab 2,Tech Center,2,55,"Lab Equipment,AC,Whiteboard",no,lab,active
+R008,Board Room,Admin Block,1,20,"Smart Screen,AC,Whiteboard,Projector",yes,board_room,active
+R009,Open Study Hall,Library,1,200,"Whiteboard,AC",yes,study_hall,active
+R010,Mini Theater,Arts Block,0,80,"Smart Screen,Projector,AC",yes,mini_theater,active
+R011,Design Studio,Arts Block,2,30,"Whiteboard,AC",no,studio,active
+R012,Physics Lab,Science Block,1,45,"Lab Equipment,AC,Whiteboard",yes,lab,active
+R013,Chemistry Lab,Science Block,2,40,"Lab Equipment,AC",no,lab,active
+R014,Discussion Room A,Library,1,12,"Whiteboard",yes,discussion_room,active
+R015,Discussion Room B,Library,1,12,"Whiteboard,Projector",yes,discussion_room,active
+R016,Conference Room,Admin Block,2,25,"Smart Screen,AC,Projector",no,conference_room,active
+R017,Sports Meeting Room,Sports Complex,1,20,"Whiteboard,AC",yes,meeting_room,active
+R018,Auditorium,Main Block,0,500,"Projector,Smart Screen,AC",yes,auditorium,active
+R019,Rooftop Studio,Arts Block,4,25,"Whiteboard",no,studio,maintenance
+R020,Biotech Lab,Science Block,3,30,"Lab Equipment,AC,Smart Screen",no,lab,active
